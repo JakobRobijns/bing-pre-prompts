@@ -1,4 +1,4 @@
-const prompts = [
+let prompts = [
   {
     id: 1,
     title: "🧑‍💻 Debug mode",
@@ -34,79 +34,53 @@ const html_cibSidePanel = `
 <cib-side-panel-2 slot="side-panel-2" style="height: 30%;"></cib-side-panel-2>
 `;
 
-var html_promptList = `
-<style>
-.pre-prompt-list{
-  margin: 10px;
-  background: var(--cib-color-neutral-layer-card-disabled);
-  box-shadow: var(--cib-shadow-elevation-4);
-  transition: all 0.2s ease-in-out, background-color 0.2s ease-in-out;
-  border-radius: 8px;
-  cursor: pointer;
-}
+const css_style = `
+<style type="text/css">
+  .prompt-card {
+    height: 60%;
+    overflow: auto;
+    margin: 10px;
+  }
 
+  .pre-prompt-list {
 
-.pre-prompt-card {
-  padding: 12px 8px;
-  margin: 5px;
-  display: flex;
-  flex-direction: column;
-  max-height: 100%;
+    background: var(--cib-color-neutral-layer-card-disabled);
+    box-shadow: var(--cib-shadow-elevation-4);
+    transition: all 0.2s ease-in-out, background-color 0.2s ease-in-out;
+    border-radius: 8px;
+    cursor: pointer;
+  }
 
-}
-.pre-prompt-card:hover {
-  /*box-shadow: var(--cib-shadow-elevation-8);
+  .pre-prompt-card {
+    padding: 12px 8px;
+    margin: 5px;
+    display: flex;
+    flex-direction: column;
+    max-height: 100%;
+  }
+
+  .pre-prompt-card:hover {
+    /*box-shadow: var(--cib-shadow-elevation-8);
     box-shadow: var(--cib-shadow-elevation-1);*/
-  padding: 12px 8px 12px 5px;
-  background: var(--cib-color-neutral-layer-card);
-  border-width: 0 0 0 4px;
-  border-style: solid;
-  border-image: 
-  linear-gradient(
-    to bottom, 
-    rgba(58,188,245,1), 
-    rgba(35,82,226,1)
-  ) 1 100%;
-}
-</style>
-<div class="pre-prompt-list">
-`;
+    padding: 12px 8px 12px 5px;
+    background: var(--cib-color-neutral-layer-card);
+    border-width: 0 0 0 4px;
+    border-style: solid;
+    border-image:
+      linear-gradient(to bottom,
+        rgba(58, 188, 245, 1),
+        rgba(35, 82, 226, 1)) 1 100%;
+  }
 
-// Loop trough the pre prompts and add them to the html_promptList variable. If there is click on the card, it calls the function onClickPrompt
-prompts.forEach((prompt) => {
-  html_promptList += `
-   <div class="pre-prompt-card" id="prompt-${prompt.id}" promptid="${prompt.id}">
-    <div class="pre-prompt-card__body" promptid="${prompt.id}">
-      <div class="pre-prompt-card__body__content" promptid="${prompt.id}">
-        <div class="pre-prompt-card__body__content__description" promptid="${prompt.id}">
-          <div class="body-1" promptid="${prompt.id}">${prompt.title}</div>
-        </div>
-      </div>
-    </div>
-  </div>
-  `;
-
-});
-
-
-
-html_promptList += `</div>`;
-
-html_promptList += `
-<label class="newPrompt__header" for="newPrompt"
-style="
+  .newPrompt__header {
     font-size: var(--cib-type-body2-font-size);
     margin: 10px 10px 0px 10px;
     color: grey;
-"
+  }
 
->Add new prompt</label>
-<input type="text" id="newPrompt" name="newPrompt" class="newPrompt__input" placeholder="Add a new prompt ➕"
-style="
-    /* background: transparent; */
+  .newPrompt__input {
+    padding: 12px 8px;
     border: 0px;
-    padding: 6px;
-    margin: 10px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -114,13 +88,11 @@ style="
     box-sizing: border-box;
     z-index: 1;
     background: var(--cib-color-neutral-input-inverted);
-    border-radius: 24px;
     outline: transparent solid 1px;
     cursor: text;
     transition-property: min-height, height, width, transform, border-radius, box-shadow;
     transition-duration: var(--cib-motion-duration-fast);
     transition-timing-function: var(--cib-motion-easing-in);
-    box-shadow: var(--cib-shadow-card);
     font-size: var(--cib-type-body2-font-size);
     line-height: var(--cib-type-body2-line-height);
     font-weight: var(--cib-type-body2-font-weight);
@@ -129,11 +101,18 @@ style="
     box-shadow: var(--cib-shadow-elevation-4);
     transition: all 0.2s ease-in-out, background-color 0.2s ease-in-out;
     border-radius: 8px;
-    cursor: pointer;
-    padding: 12px 8px;
-    margin: 10px;
-">
-  `;
+    margin: 5px;
+    max-height: 100%;
+    width: -webkit-fill-available;
+  }
+</style>
+`;
+
+const html_newPromptInput = `
+  <label class="newPrompt__header" for="newPrompt">Add new prompt</label>
+  <input type="text" id="newPrompt" name="newPrompt" class="newPrompt__input" placeholder="Add a new prompt ➕">
+`;
+
 onClickPrompt = (e) => {
   const promptId = e.target.getAttribute("promptid");
   const prompt = prompts.find((prompt) => prompt.id == promptId);
@@ -162,40 +141,125 @@ onClickPrompt = (e) => {
 window.onload = function () {
   const interval = setInterval(() => {
     const initLoad = document.querySelector("#b_sydConvCont > cib-serp");
-    let promptsList = localStorage.getItem("promptsList");
-    if (promptsList) {
-      let promptsNew = JSON.parse(promptsList);
-      console.log(promptsNew)
 
-    } else {
-      localStorage.setItem("promptsList", JSON.stringify(prompts));
-    }
     console.log(initLoad)
     if (initLoad) {
       clearInterval(interval);
-
       const selectorSidePanel = document.querySelector("#b_sydConvCont > cib-serp").shadowRoot.querySelector("#cib-conversation-main").querySelector('cib-side-panel');
 
       // add the html_cibSidePanel to the side panel to later add the pre prompts list
       selectorSidePanel.insertAdjacentHTML('afterend', html_cibSidePanel);
-      selectorSidePanel.style.height = "50%";
+      // selectorSidePanel.style.height = "60%";
 
       setTimeout(() => {
+        setPrompts();
+        generatePromptHtml();
+        addPromptsToSidePanel();
 
-        const selectorSlotSidePanel = document.querySelector("#b_sydConvCont > cib-serp").shadowRoot.querySelector("#cib-conversation-main").querySelector('[slot="side-panel"]');
-        const selectorSlotSidePanel_historyMain = selectorSlotSidePanel.shadowRoot.querySelector(".main");
-
-        selectorSlotSidePanel_historyMain.insertAdjacentHTML('afterend', html_header); //add the header to the side panel pre prompts list
-        selectorSlotSidePanel.shadowRoot.querySelector("#preprompt").insertAdjacentHTML('afterend', html_promptList); //THIS WORKS
-
-        // add the click event to the pre prompts cards
-        setTimeout(() => {
-          prompts.forEach((prompt) => {
-            const elementPrompt = selectorSlotSidePanel.shadowRoot.querySelector(`#prompt-${prompt.id}`)
-            elementPrompt.addEventListener("click", onClickPrompt);
-          });
-        }, 500);
       }, 1000);
     }
   }, 500);
+}
+
+onEnterNewPrompt = (e) => {
+  if (e.keyCode === 13) {
+    e.preventDefault();
+    const newPrompt = e.target.value;
+    const newPromptId = prompts.length + 1;
+    const newPromptObject = {
+      id: newPromptId,
+      title: newPrompt,
+      prompt: newPrompt
+    }
+    prompts.push(newPromptObject);
+    localStorage.setItem("promptsList", JSON.stringify(prompts));
+    e.target.value = "";
+    setPrompts();
+    addPromptToListHtml(newPromptObject);
+  }
+}
+
+setPrompts = () => {
+  const promptsList = localStorage.getItem("promptsList");
+  if (promptsList) {
+    prompts = JSON.parse(promptsList);
+  }
+  
+}
+
+generatePromptHtml = () => {
+  // Loop trough the pre prompts and add them to the html_promptList variable. If there is click on the card, it calls the function onClickPrompt
+  html_promptList = `<div class="prompt-card"><div class="pre-prompt-list" id="pre-prompt-list">`;
+
+  prompts.forEach((prompt) => {
+    html_promptList += `
+   <div class="pre-prompt-card" id="prompt-${prompt.id}" promptid="${prompt.id}">
+    <div class="pre-prompt-card__body" promptid="${prompt.id}">
+      <div class="pre-prompt-card__body__content" promptid="${prompt.id}">
+        <div class="pre-prompt-card__body__content__description" promptid="${prompt.id}">
+          <div class="body-1" promptid="${prompt.id}">${prompt.title}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  `;
+  });
+
+  html_promptList += `</div>`;
+}
+
+addPromptsToSidePanel = () => {
+
+  const selectorSlotSidePanel = document.querySelector("#b_sydConvCont > cib-serp").shadowRoot.querySelector("#cib-conversation-main").querySelector('[slot="side-panel"]');
+
+  if (!selectorSlotSidePanel.shadowRoot.querySelector(".main").querySelector("#preprompt")){
+    selectorSlotSidePanel.shadowRoot.querySelector(".main").insertAdjacentHTML('afterend', html_header); 
+  }
+
+  //add css
+  selectorSlotSidePanel.shadowRoot.querySelector("#preprompt").insertAdjacentHTML('afterend', css_style);
+
+  // remove existing html elements
+
+  if (selectorSlotSidePanel.shadowRoot.querySelector("#pre-prompt-list")){
+    const toremove = selectorSlotSidePanel.shadowRoot.querySelector("#pre-prompt-list");
+    toremove.remove();
+    toremove.innerHTML = "";
+  }else{
+    selectorSlotSidePanel.shadowRoot.querySelector("#preprompt").insertAdjacentHTML('afterend', html_promptList);
+  }
+  prompts.forEach((prompt) => {
+    const elementPrompt = selectorSlotSidePanel.shadowRoot.querySelector(`#prompt-${prompt.id}`)
+    console.log(elementPrompt)
+    elementPrompt.addEventListener("click", onClickPrompt);
+  });
+
+  selectorSlotSidePanel.shadowRoot.querySelector("#pre-prompt-list").insertAdjacentHTML('afterend', html_newPromptInput); //THIS WORKS
+
+  // add the onEnter event to the new prompt input
+  const newPromptInput = selectorSlotSidePanel.shadowRoot.querySelector("#newPrompt");
+  console.log(newPromptInput)
+  newPromptInput.addEventListener("keyup", onEnterNewPrompt);
+}
+
+addPromptToListHtml = (prompt) => {
+  let html_prompCard = `
+  <div class="pre-prompt-card" id="prompt-${prompt.id}" promptid="${prompt.id}">
+    <div class="pre-prompt-card__body" promptid="${prompt.id}">
+      <div class="pre-prompt-card__body__content" promptid="${prompt.id}">
+        <div class="pre-prompt-card__body__content__description" promptid="${prompt.id}">
+          <div class="body-1" promptid="${prompt.id}">${prompt.title}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  `;
+
+  const selectorSlotSidePanel = document.querySelector("#b_sydConvCont > cib-serp").shadowRoot.querySelector("#cib-conversation-main").querySelector('[slot="side-panel"]');
+  selectorSlotSidePanel.shadowRoot.querySelector("#pre-prompt-list").insertAdjacentHTML('beforeend', html_prompCard);
+
+  const elementPrompt = selectorSlotSidePanel.shadowRoot.querySelector(`#prompt-${prompt.id}`)
+  console.log(elementPrompt)
+  elementPrompt.addEventListener("click", onClickPrompt);
 }
