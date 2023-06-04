@@ -1,12 +1,13 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Bing Chat Pre Prompts",
+  "description": "Bing Chat Pre Prompts to help you get started with your chat.", 
   "version": "0.1",
   "icons": {
     "16": "icon16.png",
     "48": "icon48.png",
    "128": "icon128.png" },
-  "browser_action": {
+  "action": {
     "default_icon": "icon.png"
   },
   "content_scripts": [
